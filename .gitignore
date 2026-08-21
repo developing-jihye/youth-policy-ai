@@ -1,0 +1,82 @@
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE
+# =========================
+.idea/
+*.iml
+.vscode/
+
+# =========================
+# Java / Spring Boot / Gradle
+# =========================
+backend/.gradle/
+backend/build/
+backend/out/
+backend/bin/
+backend/.classpath
+backend/.project
+backend/.settings/
+
+# Gradle
+.gradle/
+build/
+
+# =========================
+# Node / Next.js
+# =========================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/.turbo/
+
+# =========================
+# Python / FastAPI
+# =========================
+ai-server/__pycache__/
+ai-server/*.py[cod]
+ai-server/.venv/
+ai-server/venv/
+ai-server/.pytest_cache/
+ai-server/.mypy_cache/
+
+# =========================
+# Environment variables / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+backend/.env
+frontend/.env.local
+ai-server/.env
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# Local uploads / storage
+# =========================
+uploads/
+storage/
+data/
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+temp/
+*.tmp
+
+# =========================
+# Codex / local AI tooling
+# =========================
+.codex/
