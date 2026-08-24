@@ -80,3 +80,8 @@ temp/
 # Codex / local AI tooling
 # =========================
 .codex/
+
+
+# 추가
+/.metadata/
+/.project
