@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,8 +46,20 @@ public class PolicyController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<PolicyResponse>> getAll() {
-		List<PolicyResponse> responses = policyService.getAll().stream()
+	public ResponseEntity<List<PolicyResponse>> getAll(
+			@RequestParam(name = "region", required = false) String region
+	) {
+		List<Policy> policies;
+		if (region == null) {
+			policies = policyService.getAll();
+		} else {
+			if (region.isBlank()) {
+				throw new IllegalArgumentException("region must not be blank");
+			}
+			policies = policyService.getByRegion(region.trim());
+		}
+
+		List<PolicyResponse> responses = policies.stream()
 				.map(PolicyResponse::from)
 				.toList();
 

@@ -134,4 +134,57 @@ class PolicyServiceTest {
 		assertThat(foundSecondPolicy.getRecruitmentStatus()).isEqualTo(RecruitmentStatus.UPCOMING);
 		assertThat(foundSecondPolicy.getSourceUrl()).isEqualTo("https://example.go.kr/policies/service-list-2");
 	}
+
+	@Test
+	void getByRegionReturnsMatchingPolicies() {
+		LocalDate seoulStartDate = LocalDate.of(2026, 8, 25);
+		LocalDate seoulEndDate = LocalDate.of(2026, 9, 30);
+		Policy seoulPolicy = policyService.register(new Policy(
+				"서울 지역 Service 정책",
+				"취업",
+				"서울 청년정책기관",
+				"서울",
+				seoulStartDate,
+				seoulEndDate,
+				RecruitmentStatus.OPEN,
+				"https://example.go.kr/policies/service-seoul"
+		));
+		Policy busanPolicy = policyService.register(new Policy(
+				"부산 지역 Service 정책",
+				"주거",
+				"부산 청년정책기관",
+				"부산",
+				LocalDate.of(2026, 10, 1),
+				LocalDate.of(2026, 10, 31),
+				RecruitmentStatus.UPCOMING,
+				"https://example.go.kr/policies/service-busan"
+		));
+
+		Long seoulPolicyId = seoulPolicy.getId();
+		Long busanPolicyId = busanPolicy.getId();
+		assertThat(seoulPolicyId).isNotNull();
+		assertThat(busanPolicyId).isNotNull();
+		entityManager.flush();
+		entityManager.clear();
+
+		List<Policy> policies = policyService.getByRegion("서울");
+		Policy foundSeoulPolicy = policies.stream()
+				.filter(policy -> seoulPolicyId.equals(policy.getId()))
+				.findFirst()
+				.orElseThrow();
+
+		assertThat(policies)
+				.extracting(Policy::getId)
+				.contains(seoulPolicyId)
+				.doesNotContain(busanPolicyId);
+		assertThat(foundSeoulPolicy.getId()).isEqualTo(seoulPolicyId);
+		assertThat(foundSeoulPolicy.getName()).isEqualTo("서울 지역 Service 정책");
+		assertThat(foundSeoulPolicy.getCategory()).isEqualTo("취업");
+		assertThat(foundSeoulPolicy.getOrganization()).isEqualTo("서울 청년정책기관");
+		assertThat(foundSeoulPolicy.getRegion()).isEqualTo("서울");
+		assertThat(foundSeoulPolicy.getApplicationStartDate()).isEqualTo(seoulStartDate);
+		assertThat(foundSeoulPolicy.getApplicationEndDate()).isEqualTo(seoulEndDate);
+		assertThat(foundSeoulPolicy.getRecruitmentStatus()).isEqualTo(RecruitmentStatus.OPEN);
+		assertThat(foundSeoulPolicy.getSourceUrl()).isEqualTo("https://example.go.kr/policies/service-seoul");
+	}
 }

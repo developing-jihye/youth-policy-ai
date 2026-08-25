@@ -32,4 +32,9 @@ public class PolicyService {
 	public List<Policy> getAll() {
 		return policyRepository.findAll();
 	}
+
+	@Transactional(readOnly = true)
+	public List<Policy> getByRegion(String region) {
+		return policyRepository.findAllByRegion(region);
+	}
 }

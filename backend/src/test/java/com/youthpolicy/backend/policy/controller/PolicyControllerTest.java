@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -137,6 +138,38 @@ class PolicyControllerTest {
 				.andExpect(content().json("[]"));
 
 		verify(policyService).getAll();
+	}
+
+	@Test
+	void getAllFiltersByRegion() throws Exception {
+		Policy seoulPolicy = createPolicyMock(1L);
+		given(seoulPolicy.getRegion()).willReturn("서울");
+		given(policyService.getByRegion("서울")).willReturn(List.of(seoulPolicy));
+
+		mockMvc.perform(get("/api/policies").queryParam("region", "서울"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$.length()").value(1))
+				.andExpect(jsonPath("$[0].id").value(1))
+				.andExpect(jsonPath("$[0].name").value("청년 정책 Controller 테스트"))
+				.andExpect(jsonPath("$[0].category").value("취업"))
+				.andExpect(jsonPath("$[0].organization").value("청년정책기관"))
+				.andExpect(jsonPath("$[0].region").value("서울"))
+				.andExpect(jsonPath("$[0].applicationStartDate").value("2026-08-25"))
+				.andExpect(jsonPath("$[0].applicationEndDate").value("2026-09-30"))
+				.andExpect(jsonPath("$[0].recruitmentStatus").value("OPEN"))
+				.andExpect(jsonPath("$[0].sourceUrl").value("https://example.go.kr/policies/controller-test"));
+
+		verify(policyService).getByRegion("서울");
+		verify(policyService, never()).getAll();
+	}
+
+	@Test
+	void getAllReturnsBadRequestWhenRegionIsBlank() throws Exception {
+		mockMvc.perform(get("/api/policies").queryParam("region", ""))
+				.andExpect(status().isBadRequest());
+
+		verifyNoInteractions(policyService);
 	}
 
 	@Test
