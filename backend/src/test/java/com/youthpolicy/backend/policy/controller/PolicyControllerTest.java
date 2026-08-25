@@ -12,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -93,6 +94,49 @@ class PolicyControllerTest {
 				.andExpect(status().isBadRequest());
 
 		verifyNoInteractions(policyService);
+	}
+
+	@Test
+	void getAllReturnsOk() throws Exception {
+		Policy firstPolicy = createPolicyMock(1L);
+		Policy secondPolicy = createPolicyMock(2L);
+		given(policyService.getAll()).willReturn(List.of(firstPolicy, secondPolicy));
+
+		mockMvc.perform(get("/api/policies"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("$.length()").value(2))
+				.andExpect(jsonPath("$[0].id").value(1))
+				.andExpect(jsonPath("$[0].name").value("청년 정책 Controller 테스트"))
+				.andExpect(jsonPath("$[0].category").value("취업"))
+				.andExpect(jsonPath("$[0].organization").value("청년정책기관"))
+				.andExpect(jsonPath("$[0].region").value("전국"))
+				.andExpect(jsonPath("$[0].applicationStartDate").value("2026-08-25"))
+				.andExpect(jsonPath("$[0].applicationEndDate").value("2026-09-30"))
+				.andExpect(jsonPath("$[0].recruitmentStatus").value("OPEN"))
+				.andExpect(jsonPath("$[0].sourceUrl").value("https://example.go.kr/policies/controller-test"))
+				.andExpect(jsonPath("$[1].id").value(2))
+				.andExpect(jsonPath("$[1].name").value("청년 정책 Controller 테스트"))
+				.andExpect(jsonPath("$[1].category").value("취업"))
+				.andExpect(jsonPath("$[1].organization").value("청년정책기관"))
+				.andExpect(jsonPath("$[1].region").value("전국"))
+				.andExpect(jsonPath("$[1].applicationStartDate").value("2026-08-25"))
+				.andExpect(jsonPath("$[1].applicationEndDate").value("2026-09-30"))
+				.andExpect(jsonPath("$[1].recruitmentStatus").value("OPEN"))
+				.andExpect(jsonPath("$[1].sourceUrl").value("https://example.go.kr/policies/controller-test"));
+
+		verify(policyService).getAll();
+	}
+
+	@Test
+	void getAllReturnsEmptyList() throws Exception {
+		given(policyService.getAll()).willReturn(List.of());
+
+		mockMvc.perform(get("/api/policies"))
+				.andExpect(status().isOk())
+				.andExpect(content().json("[]"));
+
+		verify(policyService).getAll();
 	}
 
 	@Test

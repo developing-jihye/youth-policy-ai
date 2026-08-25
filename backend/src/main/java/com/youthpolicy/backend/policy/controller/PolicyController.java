@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -41,6 +42,15 @@ public class PolicyController {
 		Policy policy = policyService.getById(id);
 
 		return ResponseEntity.ok(PolicyResponse.from(policy));
+	}
+
+	@GetMapping
+	public ResponseEntity<List<PolicyResponse>> getAll() {
+		List<PolicyResponse> responses = policyService.getAll().stream()
+				.map(PolicyResponse::from)
+				.toList();
+
+		return ResponseEntity.ok(responses);
 	}
 
 	@ExceptionHandler(NoSuchElementException.class)
